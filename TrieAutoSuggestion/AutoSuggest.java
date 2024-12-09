@@ -111,4 +111,29 @@ public class AutoSuggest {
         }
 
     }
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        Trie trie = new Trie();
+        System.out.println("Enter words for the dictionary (type 'done' to finish):");
+        while (true) {
+            String word = scanner.nextLine();
+            if (word.equalsIgnoreCase("done")) break;
+            trie.insert(word);
+        }
+
+        System.out.println("\nDictionary initialized. Enter queries (type 'exit' to quit):");
+        while (true) {
+            System.out.print("Enter your query: ");
+            String query = scanner.nextLine();
+            if (query.equalsIgnoreCase("exit")) break;
+
+            Set<String> suggestions = trie.findSuggestions(query, 3);
+            suggestions.removeIf(word -> !trie.isWithinEditDistance(word, query, 3)); // Filter irrelevant matches
+            suggestions.removeIf(query::matches);
+            System.out.println("Suggestions (up to 3 errors allowed): " + suggestions);
+        }
+
+        scanner.close();
+    }
 }
