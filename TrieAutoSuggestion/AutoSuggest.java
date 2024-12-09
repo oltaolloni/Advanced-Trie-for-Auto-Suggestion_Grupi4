@@ -41,6 +41,51 @@ public class AutoSuggest {
             return suggestions;
         }
 
+        //Funksioni kontrollon çdo degë të mundshme të Trie-s, duke krahasuar shkronjat aktuale dhe duke llogaritur
+        // ndryshimet e mbetura, derisa të përputhet me fundin e një fjale valide ose të tejkalohet kufiri i lejuar i
+        // ndryshimeve.
+        private void dfs(TrieNode node, String currentWord, String query, int queryIndex, int remainingEdits, Set<String> suggestions) {
+            if (node == null) return;
+
+            // If the remaining edits are negative, this path is invalid
+            if (remainingEdits < 0) return;
+
+            // If we've consumed the query
+            if (queryIndex == query.length()) {
+                if (node.isEndOfWord && remainingEdits >= 0) {
+                    suggestions.add(currentWord);
+                }
+                return;
+            }
+
+            char currentChar = query.charAt(queryIndex);
+
+            // Exact match
+            if (node.children.containsKey(currentChar)) {
+                dfs(node.children.get(currentChar), currentWord + currentChar, query, queryIndex + 1, remainingEdits, suggestions);
+            }
+
+            // Substitution: Try replacing the current character
+            for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
+                char childChar = entry.getKey();
+                if (childChar != currentChar && remainingEdits > 0) {
+                    dfs(entry.getValue(), currentWord + childChar, query, queryIndex + 1, remainingEdits - 1, suggestions);
+                }
+            }
+
+            // Deletion: Skip the current character in the query
+            if (remainingEdits > 0) {
+                dfs(node, currentWord, query, queryIndex + 1, remainingEdits - 1, suggestions);
+            }
+
+            // Insertion: Add an extra character from Trie
+            for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
+                if (remainingEdits > 0) {
+                    dfs(entry.getValue(), currentWord + entry.getKey(), query, queryIndex, remainingEdits - 1, suggestions);
+                }
+            }
+        }
+
 
         //Validon suggestions duke kalkuluar Lavenshtein distancen mes word dhe query
         //Ndihmon qe e njejta fjale mos mu paraqite si suggestion disa here
@@ -61,6 +106,8 @@ public class AutoSuggest {
                 }
             }
             return dp[word.length()][query.length()] <= maxEdits;
+
+
         }
 
     }
