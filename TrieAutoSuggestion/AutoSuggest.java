@@ -33,5 +33,35 @@ public class AutoSuggest {
             current.isEndOfWord = true;
         }
 
+
+        //Gjen fjalet ne Trie qe jane te ngjajshme me query me ane te dfs
+        public Set<String> findSuggestions(String query, int maxEdits) {
+            Set<String> suggestions = new HashSet<>();
+            dfs(root, "", query, 0, maxEdits, suggestions);
+            return suggestions;
+        }
+
+
+        //Validon suggestions duke kalkuluar Lavenshtein distancen mes word dhe query
+        //Ndihmon qe e njejta fjale mos mu paraqite si suggestion disa here
+        public boolean isWithinEditDistance(String word, String query, int maxEdits) {
+            int[][] dp = new int[word.length() + 1][query.length() + 1];
+
+            for (int i = 0; i <= word.length(); i++) {
+                for (int j = 0; j <= query.length(); j++) {
+                    if (i == 0) {
+                        dp[i][j] = j;
+                    } else if (j == 0) {
+                        dp[i][j] = i;
+                    } else if (word.charAt(i - 1) == query.charAt(j - 1)) {
+                        dp[i][j] = dp[i - 1][j - 1];
+                    } else {
+                        dp[i][j] = 1 + Math.min(dp[i - 1][j - 1], Math.min(dp[i - 1][j], dp[i][j - 1]));
+                    }
+                }
+            }
+            return dp[word.length()][query.length()] <= maxEdits;
+        }
+
     }
 }
