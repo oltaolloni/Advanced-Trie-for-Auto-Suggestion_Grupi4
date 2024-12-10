@@ -1,6 +1,7 @@
 package TrieAutoSuggestion;
 
 import java.util.*;
+import java.io.*;
 
 public class AutoSuggest {
 
@@ -106,22 +107,28 @@ public class AutoSuggest {
                 }
             }
             return dp[word.length()][query.length()] <= maxEdits;
-
-
         }
-
     }
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
 
+    public static void main(String[] args) {
         Trie trie = new Trie();
-        System.out.println("Enter words for the dictionary (type 'done' to finish):");
-        while (true) {
-            String word = scanner.nextLine();
-            if (word.equalsIgnoreCase("done")) break;
-            trie.insert(word);
+
+        // Static path to the dictionary file
+        String filePath = "TrieAutoSuggestion/dictionary.txt";
+
+        // Load words from the file
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String word;
+            while ((word = reader.readLine()) != null) {
+                trie.insert(word.trim()); // Insert each word into the trie
+            }
+            System.out.println("Dictionary loaded from file.");
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+            return;
         }
 
+        Scanner scanner = new Scanner(System.in);
         System.out.println("\nDictionary initialized. Enter queries (type 'exit' to quit):");
         while (true) {
             System.out.print("Enter your query: ");
