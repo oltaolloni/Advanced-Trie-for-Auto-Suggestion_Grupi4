@@ -5,75 +5,72 @@ import java.io.*;
 
 public class AutoSuggest {
 
-    //perfaqeson nje nyje ne Trie
     static class TrieNode {
         Map<Character, TrieNode> children = new HashMap<>();
         boolean isEndOfWord = false;
     }
 
     static class Trie {
-        TrieNode root; //rrenja, pika fillestare e Trie
+        TrieNode root;
 
         public Trie() {
             root = new TrieNode();
         }
 
         public void insert(String word) {
-            TrieNode current = root; //vendosim root si pike momentale
+            TrieNode current = root;
             for (char ch : word.toCharArray()) {
-                current.children.putIfAbsent(ch, new TrieNode());
-                current = current.children.get(ch); //behet update nyja momentale
+                current = current.children.computeIfAbsent(ch, k -> new TrieNode());
             }
-            current.isEndOfWord = true; //vendoset nyja si mbarim i fjales
+            current.isEndOfWord = true;
         }
 
         public Set<String> findSuggestions(String query, int maxEdits) {
             Set<String> suggestions = new HashSet<>();
-            dfs(root, query, 0, "", maxEdits, suggestions);
+            dfs(root, query, 0, new StringBuilder(), maxEdits, suggestions);
             return suggestions;
         }
 
-        private void dfs(TrieNode node, String query, int index, String currentWord, int editsRemaining, Set<String> suggestions) {
-
+        private void dfs(TrieNode node, String query, int index, StringBuilder currentWord, int editsRemaining, Set<String> suggestions) {
             if (editsRemaining < 0) {
                 return;
             }
 
-            // If we've processed the entire query and reached a word's end
             if (index == query.length()) {
                 if (node.isEndOfWord) {
-                    suggestions.add(currentWord);
+                    suggestions.add(currentWord.toString());
                 }
-
-                // Even if we're at the end of the query, we need to explore the possibility of insertions
                 for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
-                    dfs(entry.getValue(), query, index, currentWord + entry.getKey(), editsRemaining - 1, suggestions);
+                    currentWord.append(entry.getKey());
+                    dfs(entry.getValue(), query, index, currentWord, editsRemaining - 1, suggestions);
+                    currentWord.deleteCharAt(currentWord.length() - 1);
                 }
-
                 return;
             }
 
             char targetChar = query.charAt(index);
 
-            // Case 1: Exact match (no edit)
             if (node.children.containsKey(targetChar)) {
-                dfs(node.children.get(targetChar), query, index + 1, currentWord + targetChar, editsRemaining, suggestions);
+                currentWord.append(targetChar);
+                dfs(node.children.get(targetChar), query, index + 1, currentWord, editsRemaining, suggestions);
+                currentWord.deleteCharAt(currentWord.length() - 1);
             }
 
-            // Case 2: Substitution (edit)
             for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
                 char childChar = entry.getKey();
                 if (childChar != targetChar) {
-                    dfs(entry.getValue(), query, index + 1, currentWord + childChar, editsRemaining - 1, suggestions);
+                    currentWord.append(childChar);
+                    dfs(entry.getValue(), query, index + 1, currentWord, editsRemaining - 1, suggestions);
+                    currentWord.deleteCharAt(currentWord.length() - 1);
                 }
             }
 
-            // Case 3: Deletion (edit)
             dfs(node, query, index + 1, currentWord, editsRemaining - 1, suggestions);
 
-            // Case 4: Insertion (edit)
             for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
-                dfs(entry.getValue(), query, index, currentWord + entry.getKey(), editsRemaining - 1, suggestions);
+                currentWord.append(entry.getKey());
+                dfs(entry.getValue(), query, index, currentWord, editsRemaining - 1, suggestions);
+                currentWord.deleteCharAt(currentWord.length() - 1);
             }
         }
     }
@@ -81,7 +78,7 @@ public class AutoSuggest {
     public static void main(String[] args) {
         Trie trie = new Trie();
 
-        String filePath = "TrieAutoSuggestion/dictionary.txt";
+        String filePath = "./dictionary.txt";
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String word;
@@ -94,18 +91,17 @@ public class AutoSuggest {
             return;
         }
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("\nDictionary initialized. Enter queries (type 'exit' to quit):");
-        while (true) {
-            System.out.print("Enter your query: ");
-            String query = scanner.nextLine();
-            if (query.equalsIgnoreCase("exit")) break;
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("\nDictionary initialized. Enter queries (type 'exit' to quit):");
+            while (true) {
+                System.out.print("Enter your query: ");
+                String query = scanner.nextLine();
+                if (query.equalsIgnoreCase("exit")) break;
 
-            Set<String> suggestions = trie.findSuggestions(query, 3);
-            suggestions.removeIf(query::matches);
-            System.out.println("Suggestions (up to 3 errors allowed): " + suggestions);
+                Set<String> suggestions = trie.findSuggestions(query, 3);
+                suggestions.removeIf(query::matches);
+                System.out.println("Suggestions (up to 3 errors allowed): " + suggestions);
+            }
         }
-
-        scanner.close();
     }
 }
