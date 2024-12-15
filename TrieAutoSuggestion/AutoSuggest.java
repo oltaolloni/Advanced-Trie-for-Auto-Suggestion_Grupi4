@@ -37,7 +37,8 @@ public class AutoSuggest {
             }
 
             if (index == query.length()) {
-                if (node.isEndOfWord) {
+                // Only add non-empty strings to the suggestions
+                if (node.isEndOfWord && !currentWord.isEmpty()) {
                     suggestions.add(currentWord.toString());
                 }
                 for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
@@ -73,12 +74,13 @@ public class AutoSuggest {
                 currentWord.deleteCharAt(currentWord.length() - 1);
             }
         }
+
     }
 
     public static void main(String[] args) {
         Trie trie = new Trie();
 
-        String filePath = "./dictionary.txt";
+        String filePath = "TrieAutoSuggestion/dictionary.txt";
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String word;
