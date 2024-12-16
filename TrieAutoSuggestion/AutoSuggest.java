@@ -36,6 +36,10 @@ public class AutoSuggest {
                 return;
             }
 
+            if (node == null || currentWord.length() > query.length() + editsRemaining) {
+                return;
+            } // shkepusim para search raste qe nuk do na dergojne asesi ne suggestion valid
+
             if (index == query.length()) {
                 // Only add non-empty strings to the suggestions
                 if (node.isEndOfWord && !currentWord.isEmpty()) {
