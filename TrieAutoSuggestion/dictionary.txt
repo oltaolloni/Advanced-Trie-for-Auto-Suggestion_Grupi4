@@ -32,5 +32,14 @@ gravy
 grasp
 grapevine
 scrape
-trap
+traps
+hello world
+hello there
+hello kitty
+hello world java
+hello world c++
+hello world song
+hey world
+good morning
+good evening
 

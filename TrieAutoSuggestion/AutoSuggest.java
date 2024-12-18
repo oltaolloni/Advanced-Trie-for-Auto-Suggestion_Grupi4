@@ -12,7 +12,6 @@ public class AutoSuggest {
 
     static class Trie {
         TrieNode root;
-
         public Trie() {
             root = new TrieNode();
         }
@@ -20,7 +19,8 @@ public class AutoSuggest {
         public void insert(String word) {
             TrieNode current = root;
             for (char ch : word.toCharArray()) {
-                current = current.children.computeIfAbsent(ch, k -> new TrieNode());
+                current.children.putIfAbsent(ch, new TrieNode());
+                current = current.children.get(ch);
             }
             current.isEndOfWord = true;
         }
@@ -32,16 +32,14 @@ public class AutoSuggest {
         }
 
         private void dfs(TrieNode node, String query, int index, StringBuilder currentWord, int editsRemaining, Set<String> suggestions) {
-            if (editsRemaining < 0) {
+
+            // Shkeputja e rasteve jo valide
+            if (editsRemaining < 0 || node == null || currentWord.length() > query.length() + editsRemaining) {
                 return;
             }
 
-            if (node == null || currentWord.length() > query.length() + editsRemaining) {
-                return;
-            } // shkepusim para search raste qe nuk do na dergojne asesi ne suggestion valid
-
+            //Fundi i query-t dhe fjales
             if (index == query.length()) {
-                // Only add non-empty strings to the suggestions
                 if (node.isEndOfWord && !currentWord.isEmpty()) {
                     suggestions.add(currentWord.toString());
                 }
@@ -55,12 +53,14 @@ public class AutoSuggest {
 
             char targetChar = query.charAt(index);
 
+            // Perputhja e plote
             if (node.children.containsKey(targetChar)) {
                 currentWord.append(targetChar);
                 dfs(node.children.get(targetChar), query, index + 1, currentWord, editsRemaining, suggestions);
                 currentWord.deleteCharAt(currentWord.length() - 1);
             }
 
+            // Zevendesimi
             for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
                 char childChar = entry.getKey();
                 if (childChar != targetChar) {
@@ -70,8 +70,10 @@ public class AutoSuggest {
                 }
             }
 
+            // Fshirja
             dfs(node, query, index + 1, currentWord, editsRemaining - 1, suggestions);
 
+            // Insertimi
             for (Map.Entry<Character, TrieNode> entry : node.children.entrySet()) {
                 currentWord.append(entry.getKey());
                 dfs(entry.getValue(), query, index, currentWord, editsRemaining - 1, suggestions);
