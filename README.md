@@ -3,16 +3,12 @@
 ## **Overview**
 This project implements an **Advanced Trie for Auto-Suggestion with Error Tolerance**. The application provides word suggestions based on a user query and allows up to three character errors (substitutions, deletions, or insertions). The underlying data structure, a Trie, efficiently stores and retrieves words to handle queries interactively and support approximate matches.
 
----
-
 ## **Features**
 - **Trie-Based Word Storage**: Efficiently stores dictionary words for fast lookups.
 - **Error-Tolerant Search**: Suggests words even with up to three character mismatches in the query.
 - **Interactive CLI Interface**: Allows users to input queries and get real-time suggestions.
 - **Customizable Error Threshold**: Supports adjusting the maximum allowable errors.
-- **File-Based Dictionary Loading**: Reads words from a text file to populate the Trie.
-
----
+- **File-Based Dictionary Loading**: Reads words from a pre-existing text file to populate the Trie, with the option for users to modify it.
 
 ## **Data Structure Explanation**
 
@@ -35,16 +31,14 @@ A Trie is a tree-like data structure used for storing strings efficiently. Each 
 - **DFS for Suggestions**:
   Recursively explores all possible words that match a query, considering errors like substitutions, insertions, and deletions.
 
----
+## **How It Works and Code Explanation**
 
-## **How It Works**
-
-### **1. Building the Trie**
+### **Building the Trie**
 - The program reads a dictionary file (`dictionary.txt`) line by line.
 - Each word is inserted into the Trie using the `insert` method.
 - This method iterates over each character of the word, creating nodes in the Trie for each unique character.
 
-### **2. Query Handling**
+### **Query Handling**
 - The user inputs a query interactively.
 - The `findSuggestions` method retrieves words that match the query within a specified error tolerance (default: 3).
 - **Depth-First Search (DFS)**:
@@ -54,13 +48,9 @@ A Trie is a tree-like data structure used for storing strings efficiently. Each 
     - Character insertions.
     - Character deletions.
 
-### **3. Error Tolerance**
+### **Error Tolerance**
 - The DFS function uses `editsRemaining` to track the number of allowable mismatches.
 - Suggestions are collected whenever a valid word (`isEndOfWord`) is reached within the error threshold.
-
----
-
-## **Code Explanation**
 
 ### **Classes**
 #### 1. `TrieNode`
@@ -88,24 +78,20 @@ A Trie is a tree-like data structure used for storing strings efficiently. Each 
    - Display the suggestions.
 4. Exit when the user types `exit`.
 
----
-
 ## **Usage**
 
 ### **Input**
 1. **Dictionary File**:
-   - Create a text file named `dictionary.txt` in the `TrieAutoSuggestion` directory.
-   - Add one word per line.
-
-   Example:
-   ```
-   apple
-   application
-   banana
-   band
-   candy
-   candle
-   ```
+   - The program uses a pre-existing `dictionary.txt` file located in the `TrieAutoSuggestion` directory. This file can be modified to include custom words.
+   - Example content:
+     ```
+     apple
+     apply
+     ample
+     maple
+     grapple
+     sample
+     ```
 
 2. **User Query**:
    - Enter a word or phrase to get suggestions.
@@ -116,9 +102,13 @@ A Trie is a tree-like data structure used for storing strings efficiently. Each 
 
 Example:
 - **Input Query**: `appl`
-- **Suggestions**: `[apple, application]`
+- **Suggestions**: `[apple, apply, ample]`
 
----
+- **Input Query**: `map`
+- **Suggestions**: `[maple, ample, sample]`
+
+- **Input Query**: `grap`
+- **Suggestions**: `[grapple]`
 
 ## **Setup and Execution**
 
@@ -137,8 +127,6 @@ Example:
    java TrieAutoSuggestion.AutoSuggest
    ```
 
----
-
 ## **Customization**
 1. **Error Tolerance**:
    - Modify the `maxEdits` parameter in `findSuggestions` to allow more or fewer errors.
@@ -146,28 +134,29 @@ Example:
 2. **Dictionary Path**:
    - Change the `filePath` variable in the main method to point to a different dictionary file.
 
-3. **Sorting Suggestions**:
-   - Add sorting to the output for better readability.
-
----
 
 ## **Example Execution**
 ### **Input**:
 - Dictionary File:
   ```
   apple
-  application
-  banana
-  band
-  candy
-  candle
+  apply
+  ample
+  maple
+  grapple
+  sample
   ```
-- Query: `bana`
+- Query: `map`
 
 ### **Output**:
 ```
-Suggestions (up to 3 errors allowed): [banana]
+Suggestions (up to 3 errors allowed): [maple, ample, sample]
 ```
 
----
+## **Trie Structure Visualization**
+The following is a visual representation of the Trie built from the sample dictionary:
+
+![image](https://github.com/user-attachments/assets/1da27189-159f-4e9b-ab7f-5b2717377056)
+
+Each path in the Trie represents a word from the dictionary, and green nodes indicate the end of valid words. Subpaths allow for efficient auto-suggestions and prefix matching with error tolerance.
 
