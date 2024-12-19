@@ -15,6 +15,14 @@ This project implements an **Advanced Trie for Auto-Suggestion with Error Tolera
 ### **Trie (Prefix Tree)**
 A Trie is a tree-like data structure used for storing strings efficiently. Each node represents a character, and paths in the tree represent words or prefixes. This structure is especially useful for tasks like auto-suggestion and prefix matching.
 
+The following is a visual representation of the Trie built from the sample dictionary:
+
+<div style="text-align: center;">
+  <img src="https://github.com/user-attachments/assets/1da27189-159f-4e9b-ab7f-5b2717377056" alt="Image" style="height: 430px; width: auto;" />
+</div>
+
+Each path in the Trie represents a word from the dictionary, and green nodes indicate the end of valid words. Subpaths allow for efficient auto-suggestions and prefix matching with error tolerance.
+
 #### **Structure**:
 1. **Nodes**:
    - Represent characters.
@@ -152,11 +160,4 @@ Example:
 ```
 Suggestions (up to 3 errors allowed): [maple, ample, sample]
 ```
-
-## **Trie Structure Visualization**
-The following is a visual representation of the Trie built from the sample dictionary:
-
-![image](https://github.com/user-attachments/assets/1da27189-159f-4e9b-ab7f-5b2717377056)
-
-Each path in the Trie represents a word from the dictionary, and green nodes indicate the end of valid words. Subpaths allow for efficient auto-suggestions and prefix matching with error tolerance.
 
