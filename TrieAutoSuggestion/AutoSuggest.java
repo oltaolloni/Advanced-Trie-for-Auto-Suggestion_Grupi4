@@ -34,7 +34,7 @@ public class AutoSuggest {
         private void dfs(TrieNode node, String query, int index, StringBuilder currentWord, int editsRemaining, Set<String> suggestions) {
 
             // Shkeputja e rasteve jo valide
-            if (editsRemaining < 0 || node == null || currentWord.length() > query.length() + editsRemaining) {
+            if (editsRemaining < 0 || node == null || currentWord.length() > query.length() + 3) {
                 return;
             }
 
@@ -107,7 +107,6 @@ public class AutoSuggest {
                 if (query.equalsIgnoreCase("exit")) break;
 
                 Set<String> suggestions = trie.findSuggestions(query, 3);
-                suggestions.removeIf(query::matches);
                 System.out.println("Suggestions (up to 3 errors allowed): " + suggestions);
             }
         }
